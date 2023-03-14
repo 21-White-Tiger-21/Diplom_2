@@ -17,22 +17,17 @@ public class LoginUserTest {
     private UserClient userClient;
     private User user;
     private String accessToken;
-    private ValidatableResponse response;
 
     @Before
     public void setUp() {
         user = User.getRandomUser();
         userClient = new UserClient();
     }
-    @After
-    public void clearState() {
-        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
-    }
     @Test
     @DisplayName("Авторизация зарегистрированного пользователя")
     @Description("Пользователь успешно авторизуется, код ответа 200 OK")
     public void loginUserTest() {
-        response = userClient.createUser(user);
+        ValidatableResponse response = userClient.createUser(user);
         accessToken = response.extract().path("accessToken");
         response = userClient.loginUser(user, accessToken);
         int statusCode = response.extract().statusCode();
@@ -65,5 +60,9 @@ public class LoginUserTest {
         boolean isUserNotLogin = validatableResponse.extract().path("success");
         assertFalse(isUserNotLogin);
         assertEquals(SC_UNAUTHORIZED, statusCode);
+    }
+    @After
+    public void clearState() {
+        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
     }
 }

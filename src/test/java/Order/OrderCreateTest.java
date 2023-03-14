@@ -3,6 +3,7 @@ import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import serial.Order;
@@ -19,6 +20,7 @@ public class OrderCreateTest {
     private ValidatableResponse response;
     private Order order;
     private User user;
+    private String accessToken;
     @Before
     public void setUp() {
         userClient = new UserClient();
@@ -39,7 +41,6 @@ public class OrderCreateTest {
         boolean isCreate = response.extract().path("success");
         assertEquals(SC_OK, statusCode);
         assertTrue(isCreate);
-        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
     }
     @Test
     @DisplayName("Создание заказа без авторизации пользователя")
@@ -62,7 +63,6 @@ public class OrderCreateTest {
         assertEquals(SC_BAD_REQUEST, statusCode);
         assertFalse(isCreate);
     }
-
     @Test
     @DisplayName("Создние заказа без авторизации пользователя и с неверным хешом ингредиентов")
     @Description("Ошибка 500")
@@ -84,5 +84,9 @@ public class OrderCreateTest {
         ingredients.add(list.get(0));
         ingredients.add(list.get(5));
         ingredients.add(list.get(0));
+    }
+    @After
+    public void clearState() {
+        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
     }
 }

@@ -26,10 +26,6 @@ public class ChangingUserDataTest {
         response = userClient.createUser(user);
         accessToken = response.extract().path("accessToken");
     }
-    @After
-    public void clearState() {
-        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
-    }
     @Test
     @DisplayName("Изменение данных пользователя")
     @Description("Данные успешно изменены код ответа 200")
@@ -40,7 +36,6 @@ public class ChangingUserDataTest {
         boolean isChange = response.extract().path("success");
         assertEquals(SC_OK, statusCode);
         assertTrue(isChange);
-        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
     }
     @Test
     @DisplayName("Изменение данных пользователя без авторизации")
@@ -51,5 +46,9 @@ public class ChangingUserDataTest {
         boolean isDataNotChange = response.extract().path("success");
         assertEquals(SC_UNAUTHORIZED, statusCode);
         assertFalse(isDataNotChange);
+    }
+    @After
+    public void clearState() {
+        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
     }
 }

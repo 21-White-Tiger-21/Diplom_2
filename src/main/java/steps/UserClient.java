@@ -34,16 +34,6 @@ public class UserClient extends Config {
                 .then()
                 .log().all();
     }
-
-    public ValidatableResponse deleteUser(String accessToken) {
-        return given()
-                .spec(getBaseSpec())
-                .auth().oauth2(accessToken)
-                .log().all()
-                .delete(EndPoints.USER_PATH + "user")
-                .then()
-                .log().all();
-    }
     public ValidatableResponse updateUserWithAuth(User user, String accessToken) {
         return given()
                 .spec(getBaseSpec())
@@ -63,4 +53,15 @@ public class UserClient extends Config {
                 .then()
                 .log().all();
     }
+    public void deleteUser(String accessToken) {
+        if (accessToken != null) {
+            given().spec(getBaseSpec())
+                    .auth().oauth2(accessToken)
+                    .log().all()
+                    .delete(EndPoints.USER_PATH + "user")
+                    .then()
+                    .log().all();
+        }
+    }
 }
+

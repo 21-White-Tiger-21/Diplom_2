@@ -1,5 +1,6 @@
 package Order;
 
+import org.junit.After;
 import serial.Order;
 import steps.OrderClient;
 import serial.User;
@@ -23,9 +24,10 @@ public class GetOrderTest {
     private ValidatableResponse response;
     private Order order;
 
+
     @Before
     public void setUp() {
-        user = user.getRandomUser();
+        user = User.getRandomUser();
         userClient = new UserClient();
         orderClient = new OrderClient();
         order = new Order();
@@ -35,7 +37,7 @@ public class GetOrderTest {
     @Description("Приходит список заказов, код ответа 200")
     public void getOrdersWithAuthTest() {
         response = userClient.createUser(user);
-        accessToken = response.extract().path("accessToken");
+        String accessToken = response.extract().path("accessToken");
         userClient.loginUser(user, accessToken);
         orderClient.orderCreate(order, accessToken);
         response = orderClient.getOrdersByAuth(accessToken);
@@ -43,7 +45,6 @@ public class GetOrderTest {
         boolean isGet = response.extract().path("success");
         assertEquals(SC_OK, statusCode);
         assertTrue(isGet);
-        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
     }
     @Test
     @DisplayName("Получение заказов неавторизованного пользователя")
@@ -55,5 +56,9 @@ public class GetOrderTest {
         boolean isGet = response.extract().path("success");
         assertEquals(SC_UNAUTHORIZED, statusCode);
         assertFalse(isGet);
+    }
+    @After
+    public void clearState() {
+        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
     }
 }

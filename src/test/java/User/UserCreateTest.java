@@ -4,6 +4,7 @@ import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import serial.User;
@@ -32,7 +33,6 @@ public class UserCreateTest {
         boolean isUserCreate = response.extract().path("success");
         assertEquals(SC_OK, statusCode);
         assertTrue(isUserCreate);
-        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
     }
     @Test
     @DisplayName("Регистрация уже зарегистрированного пользователя")
@@ -45,7 +45,6 @@ public class UserCreateTest {
         boolean isCreate = response.extract().path("success");
         assertFalse(isCreate);
         assertEquals(SC_FORBIDDEN, statusCode);
-        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
     }
     @Test
     @DisplayName("Регистрация пользователя без обязательных полей")
@@ -56,6 +55,10 @@ public class UserCreateTest {
         int statusCode = response.extract().statusCode();
         boolean isUserNotCreate = response.extract().path("success");
         assertFalse(isUserNotCreate);
-        assertEquals(SC_FORBIDDEN, statusCode);// Тут падает  ошибка если добавлять удаление пользователя, т.к он не видит токен
+        assertEquals(SC_FORBIDDEN, statusCode);
+    }
+    @After
+    public void clearState() {
+        userClient.deleteUser(StringUtils.substringAfter(accessToken, " "));
     }
 }
